@@ -50,14 +50,11 @@ func (c *Chat) AddMessage(m *Message) error {
 
 	msgTokens := 0
 	for i := len(c.Messages) - 1; i >= 0; i-- {
-		s := c.Messages[i].Model.MaxTokens
-
-		if c.Messages[i].TotalTokens+msgTokens > s {
+		msgTokens += c.Messages[i].TotalTokens
+		if msgTokens > c.Messages[i].Model.MaxTokens {
 			c.Messages = c.Messages[i+1:]
 			c.Offset += (i + 1)
 			break
-		} else {
-			msgTokens += c.Messages[i].TotalTokens
 		}
 	}
 

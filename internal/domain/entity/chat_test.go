@@ -88,25 +88,54 @@ func TestChat_AddMessage(t *testing.T) {
 		m *Message
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name       string
+		fields     fields
+		args       args
+		wantErr    bool
+		wantOffset int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "should be able to add message with offset 1",
+			fields: fields{
+				ID: "",
+				Messages: []Message{
+					{
+						ID:   "12345678",
+						Role: USER,
+						Data: "You are the Best. My friend!",
+						Model: Model{
+							Name:      "gpt-4",
+							MaxTokens: 8,
+						},
+						TotalTokens: 7,
+					},
+				},
+				UserID: "12345789",
+				Status: ACTIVE,
+				Offset: 0,
+			},
+			args: args{
+				m: func() *Message {
+					m, _ := NewMessage("I kow. I kow!", Model{Name: "gpt-4", MaxTokens: 8}, SYSTEM)
+					return m
+				}(),
+			},
+			wantErr:    false,
+			wantOffset: 1,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Chat{
-				ID:        tt.fields.ID,
-				Messages:  tt.fields.Messages,
-				UserID:    tt.fields.UserID,
-				Status:    tt.fields.Status,
-				Offset:    tt.fields.Offset,
-				CreatedAt: tt.fields.CreatedAt,
+			c, err := NewChat(tt.fields.UserID, tt.fields.Messages[0].Data, tt.fields.Messages[0].Model)
+			if err != nil {
+				t.Fatalf("Err to create chat: %s", err.Error())
 			}
+
 			if err := c.AddMessage(tt.args.m); (err != nil) != tt.wantErr {
 				t.Errorf("Chat.AddMessage() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if c.Offset != tt.wantOffset {
+				t.Errorf("Offset error, want: %d, got: %d", tt.wantOffset, c.Offset)
 			}
 		})
 	}
