@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	tiktoken_go "github.com/j178/tiktoken-go"
 )
 
 type Status int8
@@ -24,17 +23,22 @@ type Chat struct {
 	CreatedAt time.Time
 }
 
-func NewChat(userID, initialMessage, model string) Chat {
-	m := NewMessage(initialMessage, model, USER)
+func NewChat(userID, initialMessage string, model Model) (*Chat, error) {
+	m, err := NewMessage(initialMessage, model, USER)
+	if err != nil {
+		return nil, err
+	}
+
 	c := Chat{
 		ID:        uuid.New().String(),
+		UserID:    userID,
 		Status:    ACTIVE,
 		CreatedAt: time.Now(),
 	}
 
 	c.AddMessage(m)
 
-	return c
+	return &c, nil
 }
 
 func (c *Chat) AddMessage(m *Message) error {
@@ -46,7 +50,7 @@ func (c *Chat) AddMessage(m *Message) error {
 
 	msgTokens := 0
 	for i := len(c.Messages) - 1; i >= 0; i-- {
-		s := tiktoken_go.GetContextSize(c.Messages[i].Model)
+		s := c.Messages[i].Model.MaxTokens
 
 		if c.Messages[i].TotalTokens+msgTokens > s {
 			c.Messages = c.Messages[i+1:]

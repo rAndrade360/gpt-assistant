@@ -9,7 +9,7 @@ func TestNewChat(t *testing.T) {
 	type args struct {
 		userID         string
 		initialMessage string
-		model          string
+		model          Model
 	}
 	tests := []struct {
 		name string
@@ -21,16 +21,22 @@ func TestNewChat(t *testing.T) {
 			args: args{
 				userID:         "123456789",
 				initialMessage: "You are the best!",
-				model:          "gpt-4",
+				model: Model{
+					Name:      "gpt-4",
+					MaxTokens: 4092,
+				},
 			},
 			want: Chat{
 				ID: "1234567890",
 				Messages: []Message{
 					{
-						Role:        USER,
-						Data:        "You are the best!",
-						Model:       "gpt-4",
-						TotalTokens: 10,
+						Role: USER,
+						Data: "You are the best!",
+						Model: Model{
+							Name:      "gpt-4",
+							MaxTokens: 4092,
+						},
+						TotalTokens: 5,
 					},
 				},
 				UserID: "123456789",
@@ -41,7 +47,7 @@ func TestNewChat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewChat(tt.args.userID, tt.args.initialMessage, tt.args.model)
+			got, _ := NewChat(tt.args.userID, tt.args.initialMessage, tt.args.model)
 			if got.Offset != tt.want.Offset {
 				t.Errorf("Offset error. want: %d, got: %d", tt.want.Offset, got.Offset)
 			}
@@ -59,7 +65,7 @@ func TestNewChat(t *testing.T) {
 					t.Errorf("Message Data error. want: %s, got: %s", tt.want.Messages[i].Data, got.Messages[i].Data)
 				}
 				if got.Messages[i].Model != tt.want.Messages[i].Model {
-					t.Errorf("Message Model error. want: %s, got: %s", tt.want.Messages[i].Model, got.Messages[i].Model)
+					t.Errorf("Message Model error. want: %v, got: %v", tt.want.Messages[i].Model, got.Messages[i].Model)
 				}
 				if got.Messages[i].TotalTokens != tt.want.Messages[i].TotalTokens {
 					t.Errorf("Message TotalTokens error. want: %d, got: %d", tt.want.Messages[i].TotalTokens, got.Messages[i].TotalTokens)
