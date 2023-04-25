@@ -7,4 +7,7 @@ require (
 	github.com/pkoukk/tiktoken-go v0.1.1
 )
 
-require github.com/dlclark/regexp2 v1.8.1 // indirect
+require (
+	github.com/dlclark/regexp2 v1.8.1 // indirect
+	github.com/sashabaranov/go-openai v1.9.0 // indirect
+)

@@ -14,6 +14,17 @@ const (
 	SYSTEM
 )
 
+func (r Role) String() string {
+	switch r {
+	case USER:
+		return "user"
+	case SYSTEM:
+		return "system"
+	default:
+		return ""
+	}
+}
+
 type Message struct {
 	ID          string
 	Role        Role
