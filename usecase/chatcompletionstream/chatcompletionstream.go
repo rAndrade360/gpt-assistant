@@ -39,6 +39,10 @@ func (uc *chatCompletionUseCaseStream) Execute(ctx context.Context, input ChatCo
 		if err != nil {
 			return err
 		}
+		err = uc.gateway.Create(ctx, chat)
+		if err != nil {
+			return err
+		}
 	}
 
 	usrMsg, err := entity.NewMessage(input.Message, *input.Config.Model, entity.USER)

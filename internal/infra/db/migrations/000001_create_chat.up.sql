@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS `chat` (
+    id VARCHAR(100) NOT NULL PRIMARY KEY,
+    user_id VARCHAR(100)
+);
